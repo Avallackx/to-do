@@ -73,12 +73,12 @@ func main() {
 		return
 	}
 
-	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"migrations": utils.Dump(migrations),
-			"direction":  direction,
-		}).Fatal("Failed to migrate database: ", err)
-	}
+	// if err != nil {
+	// 	logrus.WithFields(logrus.Fields{
+	// 		"migrations": utils.Dump(migrations),
+	// 		"direction":  direction,
+	// 	}).Fatal("Failed to migrate database: ", err)
+	// }
 
 	logrus.Infof("Applied migrations from step %d!\n", *step)
 }

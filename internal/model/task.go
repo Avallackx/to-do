@@ -6,22 +6,6 @@ import (
 	"todo-app/internal/utils"
 )
 
-type TaskRepository interface {
-	Create(ctx context.Context, input *Task) (err error)
-	DeleteByID(ctx context.Context, ID int64) (err error)
-	FindByID(ctx context.Context, ID int64) (task *Task, err error)
-	FindAll(ctx context.Context) (tasks []*Task, err error)
-	Update(ctx context.Context, input *Task) (task *Task, err error)
-}
-
-type TaskUsecase interface {
-	Create(ctx context.Context, input *Task) (task *Task, err error)
-	DeleteByID(ctx context.Context, ID int64) (err error)
-	FindByID(ctx context.Context, ID int64) (task *Task, err error)
-	FindAll(ctx context.Context) (tasks []*Task, err error)
-	Update(ctx context.Context, input *Task) (task *Task, err error)
-}
-
 type Task struct {
 	ID        int64     `json:"id"`
 	Title     string    `json:"title"`
@@ -49,6 +33,7 @@ func (i CreateTaskInput) ToModel() *Task {
 }
 
 type UpdateTaskInput struct {
+	ID        int64  `json:"id"`
 	Title     string `json:"title"`
 	Todo      string `json:"todo"`
 	Completed bool   `json:"completed"`
@@ -61,9 +46,27 @@ type GetTasksQueryParams struct {
 
 func (i UpdateTaskInput) ToModel() *Task {
 	return &Task{
+		ID:        i.ID,
 		Title:     i.Title,
 		Todo:      i.Todo,
 		Completed: i.Completed,
 		UpdatedAt: time.Now(),
 	}
+}
+
+type TaskRepository interface {
+	Create(ctx context.Context, input *Task) (err error)
+	DeleteByID(ctx context.Context, ID int64) (err error)
+	FindByID(ctx context.Context, ID int64) (task *Task, err error)
+	FindAll(ctx context.Context, query GetTasksQueryParams) (tasks []*Task, err error)
+	CountAll(ctx context.Context) (count int64, err error)
+	Update(ctx context.Context, input *Task) (task *Task, err error)
+}
+
+type TaskUsecase interface {
+	Create(ctx context.Context, input *Task) (task *Task, err error)
+	DeleteByID(ctx context.Context, ID int64) (err error)
+	FindByID(ctx context.Context, ID int64) (task *Task, err error)
+	FindAll(ctx context.Context, query GetTasksQueryParams) (tasks []*Task, count int64, err error)
+	Update(ctx context.Context, input *Task) (task *Task, err error)
 }

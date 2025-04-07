@@ -59,13 +59,25 @@ func (th *TaskHTTPHandler) DeleteTaskByID(c echo.Context) error {
 }
 
 func (th *TaskHTTPHandler) FetchTasks(c echo.Context) error {
-	tasks, err := th.TaskUsecase.FindAll(c.Request().Context())
+	queryParams := new(model.GetTasksQueryParams)
+
+	if err := c.Bind(queryParams); err != nil {
+		logrus.Error(err)
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	tasks, count, err := th.TaskUsecase.FindAll(c.Request().Context(), *queryParams)
 	if err != nil {
 		logrus.Error(err)
 		return c.JSON(utils.ParseHTTPErrorStatusCode(err), err.Error())
 	}
 
-	return c.JSON(http.StatusOK, tasks)
+	return c.JSON(http.StatusOK, model.NewPaginationResponse(
+		tasks,
+		queryParams.Page,
+		queryParams.Size,
+		count,
+	))
 }
 
 func (th *TaskHTTPHandler) FetchTaskByID(c echo.Context) error {

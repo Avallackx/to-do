@@ -5,9 +5,10 @@ import (
 	"strings"
 	"time"
 
+	"todo-app/internal/utils"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"todo-app/internal/utils"
 )
 
 func GetConf() {
@@ -69,12 +70,14 @@ func PostgresSSLMode() string {
 
 // DatabaseDSN :nodoc:
 func DatabaseDSN() string {
-	return fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s",
+	return fmt.Sprintf("postgres://%s@%s/%s?sslmode=%s",
 		PostgresUsername(),
-		PostgresPassword(),
 		PostgresHost(),
 		PostgresDatabase(),
 		PostgresSSLMode())
+	// PostgresPassword(),
+
+	// "postgres://postgres@db:5432/to-do-db?sslmode=disable"
 }
 
 // PostgresMaxIdleConns :nodoc:
@@ -114,4 +117,19 @@ func PostgresRetryAttempts() int {
 	}
 
 	return DefaultPostgresRetryAttempts
+}
+
+// RedisHost :nodoc:
+func RedisHost() string {
+	return viper.GetString("redis.host")
+}
+
+// RedisPassword :nodoc:
+func RedisPassword() string {
+	return viper.GetString("redis.password")
+}
+
+// RedisDB :nodoc:
+func RedisDB() int {
+	return viper.GetInt("redis.db")
 }

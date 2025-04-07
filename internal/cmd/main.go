@@ -8,7 +8,7 @@ import (
 	"todo-app/internal/config"
 	"todo-app/internal/db"
 	_taskHTTPHndlr "todo-app/internal/delivery/http"
-	_taskRepo "todo-app/internal/repository"
+	_repo "todo-app/internal/repository"
 	_taskUscase "todo-app/internal/usecase"
 
 	"github.com/labstack/echo/v4"
@@ -46,7 +46,10 @@ func main() {
 	e := echo.New()
 
 	db.InitializePostgresConn()
-	taskRepo := _taskRepo.NewTaskRepository(db.PostgresDB)
+	db.InitializeRedisConn()
+
+	cacheRepo := _repo.NewCacheRepository(db.RedisClient)
+	taskRepo := _repo.NewTaskRepository(db.PostgresDB, cacheRepo)
 	taskUsecase := _taskUscase.NewTaskUsecase(taskRepo)
 	_taskHTTPHndlr.NewTaskHTTPHandler(e, taskUsecase)
 

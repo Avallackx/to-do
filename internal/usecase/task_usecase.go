@@ -56,7 +56,7 @@ func (tu *taskUsecase) FindByID(ctx context.Context, ID int64) (*model.Task, err
 	return task, nil
 }
 
-func (tu *taskUsecase) FindAll(ctx context.Context, params model.GetTasksQueryParams) ([]*model.Task, error) {
+func (tu *taskUsecase) FindAll(ctx context.Context, params model.GetTasksQueryParams) ([]*model.Task, int64, error) {
 	logger := logrus.WithFields(logrus.Fields{
 		"ctx":    utils.Dump(ctx),
 		"params": utils.Dump(params),

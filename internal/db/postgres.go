@@ -7,12 +7,13 @@ import (
 	"regexp"
 	"time"
 
+	"todo-app/internal/config"
+
 	"github.com/jpillora/backoff"
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
-	"todo-app/internal/config"
 )
 
 var (
