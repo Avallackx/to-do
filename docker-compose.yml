@@ -1,0 +1,109 @@
+
+# services:
+#   go-market-warehouse-api:
+#     depends_on:
+#       local-pg-16:
+#         condition: service_healthy
+#     # always restart when app crashes
+#     restart: always
+#     build:
+#       context: .
+#     image: go-market-warehouse-api:v1.0
+#     container_name: go-market-warehouse-api
+#     hostname: go-market-warehouse-api
+#     networks:
+#       - my-local-net
+#     ports:
+#       - 80:8000
+#     deploy:
+#       restart_policy:
+#         condition: on-failure
+
+#   local-pg-16:
+#     image: postgres:16.2
+#     container_name: to-do-db
+#     hostname: to-do-db
+#     networks:
+#       - my-local-net
+#     ports:
+#       - 5432:5432
+#     volumes:
+#       - tes-pg:/var/lib/postgresql/data
+#     environment:
+#       POSTGRES_HOST_AUTH_METHOD: trust
+
+#   redis:
+#     image: redis:7.2
+#     container_name: redis
+#     hostname: redis
+#     restart: always
+#     networks:
+#       - my-local-net
+#     ports:
+#       - 6379:6379
+#     command: ["redis-server", "--appendonly", "yes"]
+#     volumes:
+#       - redis_data:/data
+   
+# volumes:
+#   tes-pg:
+#     external: true
+#   redis_data:
+
+# networks:
+#   # this will create new network based on project directory name
+#   #   driver: bridge
+#   my-local-net: # kind of alias for this docker-compose.yml
+#     name: local # local is the name when you run `docker network ls`
+#     external: true
+
+
+
+version: '3'
+
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: to-do-api:v1.0
+    container_name: to-do-api
+    networks:
+      - app-network
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "8000:8000"
+
+  db:
+    image: postgis/postgis:16-3.5
+    volumes:
+      - ./db-init.sh:/docker-entrypoint-initdb.d/init.sh
+      - pg-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+
+  redis:
+    image: redis:7
+    container_name: redis
+    restart: always
+    networks:
+      - app-network
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+
+volumes:
+  pg-data:
+  redis_data:
+  
+networks:
+  app-network:
